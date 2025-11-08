@@ -14,6 +14,13 @@ enum Day
     SATURDAY
 };
 
+enum BonusType
+{
+    BONUS_NONE = 0,
+    BONUS_WEEKEND,
+    BONUS_NIGHTTIME
+};
+
 class WeekendBonus : public PlayerScript, WorldScript
 {
 public:
@@ -31,9 +38,14 @@ private:
     void LoadDefaultValues();
     void SetRates(bool /*active*/);
     bool HasActiveMultipliers();
+    bool IsNightTime();
+    void UpdateLocalTime();
 
     bool Triggered;
+    BonusType BonusType;
     time_t LocalTime;
+    tm* tm_LocalTime;
+    int int_LocalTime;
     Milliseconds CheckFrequency;
     Milliseconds CheckTime;
     Milliseconds AnnouncementFrequency;
@@ -45,6 +57,7 @@ private:
     float ReputationMultiplier;
     uint32 ProficienciesMultiplier;
     float HonorMultiplier;
+    bool NightsEnabled;
 
     float DefaultExperienceMultiplier[6];
     float DefaultBattlegroundExperienceMultiplier[6];

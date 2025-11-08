@@ -15,15 +15,24 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
     ReputationMultiplier = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Reputation", 2.0f);
     ProficienciesMultiplier = sConfigMgr->GetOption<uint32>("WeekendBonus.Multiplier.Proficiencies", 2);
     HonorMultiplier = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Honor", 2.0f);
+    NightsEnabled = sConfigMgr->GetOption<bool>("WeekendBonus.Nights.Enabled", 0);
 
     if (reload)
     {
-        if ((localtime(&LocalTime)->tm_wday == Day::FRIDAY && localtime(&LocalTime)->tm_hour >= 18) || localtime(&LocalTime)->tm_wday == Day::SATURDAY || localtime(&LocalTime)->tm_wday == Day::SUNDAY)
+        if ((tm_LocalTime->tm_wday == Day::FRIDAY && tm_LocalTime->tm_hour >= 18) ||
+                tm_LocalTime->tm_wday == Day::SATURDAY || tm_LocalTime->tm_wday == Day::SUNDAY)
         {
+            BonusType = BONUS_WEEKEND;
+            SetRates(true);
+        }
+        else if (IsNightTime())
+        {
+            BonusType = BONUS_NIGHTTIME;
             SetRates(true);
         }
         else
         {
+            BonusType = BONUS_NONE;
             SetRates(false);
         }
     }
@@ -52,6 +61,7 @@ void WeekendBonus::LoadDefaultValues()
 
     CheckFrequency = 10s;
     AnnouncementFrequency = 1h;
+    BonusType = BONUS_NONE;
 }
 
 void WeekendBonus::SetRates(bool active)

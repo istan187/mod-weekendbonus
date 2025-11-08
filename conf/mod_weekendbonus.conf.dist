@@ -17,3 +17,6 @@ WeekendBonus.Multiplier.Proficiencies = 2
 
 # Multiplier for honor gains on weekends
 WeekendBonus.Multiplier.Honor = 2.0
+
+# Enable night time bonuses
+WeekendBonus.Nights.Enabled = 1
