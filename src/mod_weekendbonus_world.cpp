@@ -1,11 +1,14 @@
 #include "mod_weekendbonus.h"
 
 #include "WorldSessionMgr.h"
-#include <format>
 
-// 18:00:00 to 23:59:59 is considered nights
-#define NIGHTTIME_START 180000   // 120000
-#define NIGHTTIME_END 235959     // 125959
+#if WEEKENDBOUS_DEBUG
+#include <format>
+#endif
+
+// 18:00:00 to 22:00:00 (6 PM to 10 PM) is considered evening
+#define EVENING_START 180000
+#define EVENING_END 220000
 
 void WeekendBonus::OnStartup()
 {
@@ -15,19 +18,7 @@ void WeekendBonus::OnStartup()
     }
 
     Triggered = false;
-    UpdateLocalTime();
-
-    if ((tm_LocalTime->tm_wday == Day::FRIDAY && tm_LocalTime->tm_hour >= 18) ||
-            tm_LocalTime->tm_wday == Day::SATURDAY || tm_LocalTime->tm_wday == Day::SUNDAY)
-    {
-        BonusType = BONUS_WEEKEND;
-        SetRates(true);
-    }
-    else if (IsNightTime())
-    {
-        BonusType = BONUS_NIGHTTIME;
-        SetRates(true);
-    }
+    DoBonusUpdateCheck(0);
 }
 
 void WeekendBonus::OnUpdate(uint32 diff)
@@ -40,59 +31,75 @@ void WeekendBonus::OnUpdate(uint32 diff)
     CheckTime += Milliseconds(diff);
     if (CheckTime > CheckFrequency)
     {
-        UpdateLocalTime();
-
-        //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("HOUR: {}, MIN: {}, SEC: {}",
-            //tm_LocalTime->tm_hour, tm_LocalTime->tm_min, tm_LocalTime->tm_sec));
-
-        //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("CHK: {}, CONFIG: {}, TIME: {}, TRIGGERED: {}, BONUS: {}",
-            //CheckTime, NightsEnabled, int_LocalTime, Triggered, (int)BonusType));
-
-        if ((tm_LocalTime->tm_wday == Day::FRIDAY && tm_LocalTime->tm_hour >= 18) && !Triggered)
-        {
-            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is now active, granting you bonuses!");
-            BonusType = BONUS_WEEKEND;
-            SetRates(true);
-        }
-        else if (IsNightTime() && !Triggered)
-        {
-            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The night time bonus is now active, granting you bonuses!");
-            BonusType = BONUS_NIGHTTIME;
-            SetRates(true);
-        }
-        else if ((int_LocalTime < NIGHTTIME_START || int_LocalTime > NIGHTTIME_END) && Triggered)
-        {
-            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The night time bonus is no longer active.");
-            BonusType = BONUS_NONE;
-            SetRates(false);
-        }
-        else if (tm_LocalTime->tm_wday == Day::MONDAY && Triggered)
-        {
-            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is no longer active.");
-            BonusType = BONUS_NONE;
-            SetRates(false);
-        }
-
+        DoBonusUpdateCheck(diff);
         CheckTime = 0s;
     }
+}
+
+void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
+{
+    UpdateLocalTime();
+    BonusTypes bonus = GetCurrentBonusType();
+
+#if WEEKENDBOUS_DEBUG
+    //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("HOUR: {}, MIN: {}, SEC: {}",
+        //tm_LocalTime->tm_hour, tm_LocalTime->tm_min, tm_LocalTime->tm_sec));
+
+    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("CHK: {}, CONFIG: {}, TIME: {}, TRIGGERED: {}, BONUS: {}",
+        CheckTime, m_EveningEnabled, int_LocalTime, Triggered, (int)m_BonusType));
+#endif
 
     if (Triggered)
     {
-        AnnouncementTime += Milliseconds(diff);
-        if (AnnouncementTime > AnnouncementFrequency)
+        if (bonus == BONUS_NONE && m_BonusType != BONUS_NONE)
         {
-            // TODO: fix this to show message if it is night time
-            if (BonusType == BONUS_WEEKEND)
+            // the bonus period has ended
+            SetRates(false);
+            if (m_BonusType == BONUS_WEEKEND)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is active, granting you bonuses!");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is no longer active.");
             }
-            else if (BonusType == BONUS_NIGHTTIME)
+            else if (m_BonusType == BONUS_EVENING)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The night time bonus is active, granting you bonuses!");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The evening bonus is no longer active.");
             }
-            AnnouncementTime = 0s;
+            m_BonusType = BONUS_NONE;
+        }
+        else
+        {
+            // still inside the bonus period, see if it is time to announce
+            AnnouncementTime += Milliseconds(diff);
+            if (AnnouncementTime > AnnouncementFrequency)
+            {
+                if (m_BonusType == BONUS_WEEKEND)
+                {
+                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is active, granting you bonuses!");
+                }
+                else if (m_BonusType == BONUS_EVENING)
+                {
+                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The evening bonus is active, granting you bonuses!");
+                }
+                AnnouncementTime = 0s;
+            }
         }
     }
+    else
+    {
+        if (bonus != BONUS_NONE && m_BonusType == BONUS_NONE)
+        {
+            // a bonus period has started
+            m_BonusType = bonus;
+            SetRates(true);
+            if (bonus == BONUS_WEEKEND)
+            {
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is now active, granting you bonuses!");
+            }
+            else if (bonus == BONUS_EVENING)
+            {
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The evening bonus is now active, granting you bonuses!");
+            }
+        }
+    }    
 }
 
 bool WeekendBonus::HasActiveMultipliers()
@@ -114,15 +121,17 @@ void WeekendBonus::UpdateLocalTime()
     int_LocalTime = (tm_LocalTime->tm_hour * 10000) + (tm_LocalTime->tm_min * 100) + tm_LocalTime->tm_sec;
 }
 
-bool WeekendBonus::IsNightTime()
+BonusTypes WeekendBonus::GetCurrentBonusType()
 {
-    if (!NightsEnabled) return false;
-
-    if (int_LocalTime >= NIGHTTIME_START  && int_LocalTime <= NIGHTTIME_END)
+    if ((tm_LocalTime->tm_wday == Day::FRIDAY && tm_LocalTime->tm_hour >= 18) ||
+            tm_LocalTime->tm_wday == Day::SATURDAY || tm_LocalTime->tm_wday == Day::SUNDAY)
     {
-        //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "Nighttime period!");
-        return true;
+        return BONUS_WEEKEND;
+    }
+    else if (m_EveningEnabled && (int_LocalTime >= EVENING_START  && int_LocalTime < EVENING_END))
+    {
+        return BONUS_EVENING;
     }
 
-    return false;
+    return BONUS_NONE;
 }
