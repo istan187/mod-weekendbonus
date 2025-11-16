@@ -3,6 +3,8 @@
 
 #include "ScriptMgr.h"
 
+#define WEEKENDBOUS_DEBUG 0
+
 enum Day
 {
     SUNDAY = 0,
@@ -12,6 +14,13 @@ enum Day
     THURSDAY,
     FRIDAY,
     SATURDAY
+};
+
+enum BonusTypes
+{
+    BONUS_NONE = 0,
+    BONUS_WEEKEND,
+    BONUS_EVENING
 };
 
 class WeekendBonus : public PlayerScript, WorldScript
@@ -31,9 +40,15 @@ private:
     void LoadDefaultValues();
     void SetRates(bool /*active*/);
     bool HasActiveMultipliers();
+    void UpdateLocalTime();
+    BonusTypes GetCurrentBonusType();
+    void DoBonusUpdateCheck(uint32 diff);
 
     bool Triggered;
+    BonusTypes m_BonusType;
     time_t LocalTime;
+    tm* tm_LocalTime;
+    int int_LocalTime;
     Milliseconds CheckFrequency;
     Milliseconds CheckTime;
     Milliseconds AnnouncementFrequency;
@@ -45,6 +60,7 @@ private:
     float ReputationMultiplier;
     uint32 ProficienciesMultiplier;
     float HonorMultiplier;
+    bool m_EveningEnabled;
 
     float DefaultExperienceMultiplier[6];
     float DefaultBattlegroundExperienceMultiplier[6];

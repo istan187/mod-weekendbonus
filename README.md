@@ -1,5 +1,5 @@
 # Features
-This module will increase the experience, money, reputation and skill ups gained on weekends. That means friday from 18:00 (6 PM), saturday and sunday. It will announce the start and end of the weekend bonus.
+This module will increase the experience, money, reputation, and skill ups gained on weekends (and optionally evenings as well). That means Friday from 18:00 (6 PM), Saturday and Sunday (and optionally evenings 18:00 (6 PM) to 20:00 (10 PM)). It will announce the start and end of the bonus period.
 
 The multipliers can be changed using the configuration options.
 

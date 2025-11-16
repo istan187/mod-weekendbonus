@@ -4,8 +4,14 @@
 
 void WeekendBonus::OnPlayerLogin(Player* player)
 {
-    if ((localtime(&LocalTime)->tm_wday == Day::FRIDAY && localtime(&LocalTime)->tm_hour >= 18) || localtime(&LocalTime)->tm_wday == Day::SATURDAY || localtime(&LocalTime)->tm_wday == Day::SUNDAY)
+    BonusTypes bonus = GetCurrentBonusType();
+
+    if (bonus == BONUS_WEEKEND)
     {
         ChatHandler(player->GetSession()).SendSysMessage("The weekend bonus is active, granting you bonuses!");
     }
+    else if (bonus == BONUS_EVENING)
+    {
+        ChatHandler(player->GetSession()).SendSysMessage("The evening time bonus is active, granting you bonuses!");
+    }    
 }
