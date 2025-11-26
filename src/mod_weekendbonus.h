@@ -20,7 +20,16 @@ enum BonusTypes
 {
     BONUS_NONE = 0,
     BONUS_WEEKEND,
-    BONUS_EVENING
+    BONUS_EVENING,
+    BONUS_HOLIDAY
+};
+
+enum BonusMultipliers
+{
+    BM_WEEKEND = 0,
+    BM_EVENING,
+    BM_HOLIDAY,
+    BM_LAST
 };
 
 class WeekendBonus : public PlayerScript, WorldScript
@@ -43,9 +52,11 @@ private:
     void UpdateLocalTime();
     BonusTypes GetCurrentBonusType();
     void DoBonusUpdateCheck(uint32 diff);
+    bool IsTodayHoliday();
 
     bool Triggered;
     BonusTypes m_BonusType;
+    BonusMultipliers m_BonusMultiplier;
     time_t LocalTime;
     tm* tm_LocalTime;
     int int_LocalTime;
@@ -54,21 +65,28 @@ private:
     Milliseconds AnnouncementFrequency;
     Milliseconds AnnouncementTime;
 
-    float ExperienceMultiplier;
-    float MoneyMultiplier;
-    uint32 ProfessionsMultiplier;
-    float ReputationMultiplier;
-    uint32 ProficienciesMultiplier;
-    float HonorMultiplier;
-    bool m_EveningEnabled;
+    // weekend multipliers
+    float m_ExperienceMultiplier[BonusMultipliers::BM_LAST];
+    float m_MoneyMultiplier[BonusMultipliers::BM_LAST];
+    uint32 m_ProfessionsMultiplier[BonusMultipliers::BM_LAST];
+    float m_ReputationMultiplier[BonusMultipliers::BM_LAST];
+    uint32 m_ProficienciesMultiplier[BonusMultipliers::BM_LAST];
+    float m_HonorMultiplier[BonusMultipliers::BM_LAST];
 
-    float DefaultExperienceMultiplier[6];
-    float DefaultBattlegroundExperienceMultiplier[6];
-    uint32 DefaultProfessionsMultiplier[2];
-    uint32 DefaultProficienciesMultiplier[2];
-    float DefaultMoneyMultiplier;
-    float DefaultReputationMultiplier;
-    float DefaultHonorMultiplier;
+    // other optional multipliers
+    bool m_EveningEnabled;
+    bool m_HolidayEnabled;
+
+    std::vector<std::pair<int, int>> m_HolidayDates; // month, day
+
+    // default multipliers
+    float m_DefaultExperienceMultiplier[6];
+    float m_DefaultBattlegroundExperienceMultiplier[6];
+    uint32 m_DefaultProfessionsMultiplier[2];
+    uint32 m_DefaultProficienciesMultiplier[2];
+    float m_DefaultMoneyMultiplier;
+    float m_DefaultReputationMultiplier;
+    float m_DefaultHonorMultiplier;
 };
 
 #endif
