@@ -3,7 +3,7 @@
 
 #include "ScriptMgr.h"
 
-#define WEEKENDBOUS_DEBUG 0
+#define WEEKENDBONUS_DEBUG 0
 
 enum Day
 {

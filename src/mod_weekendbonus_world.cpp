@@ -2,7 +2,7 @@
 
 #include "WorldSessionMgr.h"
 
-#if WEEKENDBOUS_DEBUG
+#if WEEKENDBONUS_DEBUG
 #include <format>
 #endif
 
@@ -42,7 +42,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
     UpdateLocalTime();
     BonusTypes bonus = GetCurrentBonusType();
 
-#if WEEKENDBOUS_DEBUG
+#if WEEKENDBONUS_DEBUG
     //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("HOUR: {}, MIN: {}, SEC: {}",
         //tm_LocalTime->tm_hour, tm_LocalTime->tm_min, tm_LocalTime->tm_sec));
 
@@ -122,7 +122,7 @@ bool WeekendBonus::IsTodayHoliday()
     if (m_HolidayDates.empty()) return false;
     for (const auto& date : m_HolidayDates)
     {
-#if WEEKENDBOUS_DEBUG
+#if WEEKENDBONUS_DEBUG
         LOG_INFO("server.worldserver", "> HM: {}, HD: {}, LM: {}, LD: {}", 
             date.first, date.second, tm_LocalTime->tm_mon + 1, tm_LocalTime->tm_mday);
 #endif
