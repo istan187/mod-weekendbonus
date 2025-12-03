@@ -1,5 +1,9 @@
 [worldserver]
 
+# -----------------------------------------------------------------------------
+# Weekend
+# -----------------------------------------------------------------------------
+
 # Multiplier for experience gains on weekends
 WeekendBonus.Multiplier.Experience = 2.0
 
@@ -18,5 +22,55 @@ WeekendBonus.Multiplier.Proficiencies = 2
 # Multiplier for honor gains on weekends
 WeekendBonus.Multiplier.Honor = 2.0
 
+# -----------------------------------------------------------------------------
+# Evening
+# -----------------------------------------------------------------------------
+
 # Enable / Disable evening bonuses
 WeekendBonus.Evening.Bonuses.Enabled = 0
+
+# Multiplier for experience gains on evenings
+WeekendBonus.Multiplier.Evening.Experience = 2.0
+
+# Multiplier for money looted and rewarded from quests on evenings
+WeekendBonus.Multiplier.Evening.Money = 2.0
+
+# Multiplier for profession skill ups on evenings
+WeekendBonus.Multiplier.Evening.Professions = 2
+
+# Multiplier for reputation gains on evenings
+WeekendBonus.Multiplier.Evening.Reputation = 2.0
+
+# Multiplier for weapons and defense skill ups on evenings
+WeekendBonus.Multiplier.Evening.Proficiencies = 2
+
+# Multiplier for honor gains on evenings
+WeekendBonus.Multiplier.Evening.Honor = 2.0
+
+# -----------------------------------------------------------------------------
+# Holiday
+# -----------------------------------------------------------------------------
+
+# Enable / Disable evening bonuses
+WeekendBonus.Holiday.Bonuses.Enabled = 0
+
+# List of holidays (mm/dd and comma seperated)
+WeekendBonus.Holiday.Bonuses.Holidays = 11/27,12/25
+
+# Multiplier for experience gains on a holiday
+WeekendBonus.Multiplier.Holiday.Experience = 2.0
+
+# Multiplier for money looted and rewarded from quests on a holiday
+WeekendBonus.Multiplier.Holiday.Money = 2.0
+
+# Multiplier for profession skill ups on a holiday
+WeekendBonus.Multiplier.Holiday.Professions = 2
+
+# Multiplier for reputation gains on a holiday
+WeekendBonus.Multiplier.Holiday.Reputation = 2.0
+
+# Multiplier for weapons and defense skill ups on a holiday
+WeekendBonus.Multiplier.Holiday.Proficiencies = 2
+
+# Multiplier for honor gains on a holiday
+WeekendBonus.Multiplier.Holiday.Honor = 2.0

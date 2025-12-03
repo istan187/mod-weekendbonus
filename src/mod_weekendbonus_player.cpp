@@ -12,6 +12,10 @@ void WeekendBonus::OnPlayerLogin(Player* player)
     }
     else if (bonus == BONUS_EVENING)
     {
-        ChatHandler(player->GetSession()).SendSysMessage("The evening time bonus is active, granting you bonuses!");
+        ChatHandler(player->GetSession()).SendSysMessage("The evening bonus is active, granting you bonuses!");
+    }    
+    else if (bonus == BONUS_HOLIDAY)
+    {
+        ChatHandler(player->GetSession()).SendSysMessage("The holiday bonus is active, granting you bonuses!");
     }    
 }
