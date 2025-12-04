@@ -6,21 +6,24 @@
 #include <vector>
 #include <string>
 
-// Helper function to split a string by a delimiter
-std::vector<std::string> StringSplit(const std::string& str, char delimiter)
-{
-    std::vector<std::string> elements;
-    std::string item;
-    std::istringstream stream(str);
-    while (std::getline(stream, item, delimiter))
-    {
-        elements.push_back(item);
-    }
-    return elements;
-} 
-
 void WeekendBonus::OnAfterConfigLoad(bool reload)
 {
+    LOG_INFO("weekendbonus", "> WeekendBonus Loading Configuration");
+
+    UpdateLocalTime();
+
+    // Helper function to split a string by a delimiter
+    auto stringSplit = [](const std::string& str, char delimiter) {
+        std::vector<std::string> elements;
+        std::string item;
+        std::istringstream stream(str);
+        while (std::getline(stream, item, delimiter))
+        {
+            elements.push_back(item);
+        }
+        return elements;
+    };
+
     if (!reload)
     {
         LoadDefaultValues();
@@ -53,22 +56,52 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
     m_ProficienciesMultiplier[BM_HOLIDAY] = sConfigMgr->GetOption<uint32>("WeekendBonus.Multiplier.Holiday.Proficiencies", 2);
     m_HonorMultiplier[BM_HOLIDAY] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Holiday.Honor", 2.0f);
 
+#if WEEKENDBONUS_DEBUG
+    LOG_INFO("weekendbonus", "> Holiday List: {}", holidayListStr);
+#endif
+
     m_HolidayDates.clear();
     if (!holidayListStr.empty())
     {
         // dates will be delimited by commas, each date in MM/DD format
-        for (const std::string& dateStr : StringSplit(holidayListStr, ','))
+        for (const std::string& dateStr : stringSplit(holidayListStr, ','))
         {
+#if WEEKENDBONUS_DEBUG
+    LOG_INFO("weekendbonus", "> Date: {}", dateStr);
+#endif
+            int month = 0;
+            int day = 0;
             size_t sep = dateStr.find('/');
-            if (sep != std::string::npos)
-            {
-                int month = std::stoi(dateStr.substr(0, sep));
-                int day = std::stoi(dateStr.substr(sep + 1));
-                // validate month/day are in valid ranges
-                if (month >= 1 && month <= 12 && day >= 1 && day <= 31)
-                {
-                    m_HolidayDates.emplace_back(month, day);
+            if (sep == std::string::npos) {
+                std::string namedDate = CheckForNamedHoliday(dateStr);
+                if (namedDate.empty()) {
+#if WEEKENDBONUS_DEBUG
+    LOG_INFO("weekendbonus", "> Date: {}", " - unrecognized named holiday");
+#endif
+                    continue; // unrecognized named holiday
                 }
+                else
+                {
+#if WEEKENDBONUS_DEBUG
+    LOG_INFO("weekendbonus", "> Named MM/DD: {}", namedDate);
+#endif
+                    month = std::stoi(namedDate.substr(0, 2));
+                    day = std::stoi(namedDate.substr(3, 2));
+                }
+            }
+            else
+            {
+#if WEEKENDBONUS_DEBUG
+    LOG_INFO("weekendbonus", "> MM/DD: {}", dateStr);
+#endif
+                month = std::stoi(dateStr.substr(0, sep));
+                day = std::stoi(dateStr.substr(sep + 1));
+            }
+
+            // validate month/day are in valid ranges
+            if (month >= 1 && month <= 12 && day >= 1 && day <= 31)
+            {
+                m_HolidayDates.emplace_back(month, day);
             }
         }
     }

@@ -54,8 +54,8 @@ WeekendBonus.Multiplier.Evening.Honor = 2.0
 # Enable / Disable evening bonuses
 WeekendBonus.Holiday.Bonuses.Enabled = 0
 
-# List of holidays (mm/dd and comma seperated)
-WeekendBonus.Holiday.Bonuses.Holidays = 11/27,12/25
+# List of holidays (Named holiday or mm/dd format with each comma seperated)
+WeekendBonus.Holiday.Bonuses.Holidays = US_Thanksgiving,Christmas,02/28
 
 # Multiplier for experience gains on a holiday
 WeekendBonus.Multiplier.Holiday.Experience = 2.0

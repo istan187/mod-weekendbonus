@@ -2,6 +2,7 @@
 #define MOD_WEEKENDBONUS_H
 
 #include "ScriptMgr.h"
+#include <time.h>
 
 #define WEEKENDBONUS_DEBUG 0
 
@@ -53,17 +54,19 @@ private:
     BonusTypes GetCurrentBonusType();
     void DoBonusUpdateCheck(uint32 diff);
     bool IsTodayHoliday();
+    std::string CheckForNamedHoliday(const std::string& holidayName);
 
     bool Triggered;
     BonusTypes m_BonusType;
     BonusMultipliers m_BonusMultiplier;
     time_t LocalTime;
-    tm* tm_LocalTime;
+    struct tm tm_LocalTime;
     int int_LocalTime;
     Milliseconds CheckFrequency;
     Milliseconds CheckTime;
     Milliseconds AnnouncementFrequency;
     Milliseconds AnnouncementTime;
+    std::string m_NamedHoliday;
 
     // weekend multipliers
     float m_ExperienceMultiplier[BonusMultipliers::BM_LAST];
