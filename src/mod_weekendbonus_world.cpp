@@ -2,7 +2,7 @@
 
 #include "WorldSessionMgr.h"
 
-#if WEEKENDBOUS_DEBUG
+#if WEEKENDBONUS_DEBUG
 #include <format>
 #endif
 
@@ -12,6 +12,7 @@
 
 void WeekendBonus::OnStartup()
 {
+    LOG_INFO("weekendbonus", "> WeekendBonus Module Started");
     m_BonusMultiplier = BM_WEEKEND;
     if (!HasActiveMultipliers())
     {
@@ -42,14 +43,9 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
     UpdateLocalTime();
     BonusTypes bonus = GetCurrentBonusType();
 
-#if WEEKENDBOUS_DEBUG
-    //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("HOUR: {}, MIN: {}, SEC: {}",
-        //tm_LocalTime->tm_hour, tm_LocalTime->tm_min, tm_LocalTime->tm_sec));
-
-    //sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, std::format("CHK: {}, CONFIG: {}, TIME: {}, TRIGGERED: {}, BONUS: {}",
-        //CheckTime, m_EveningEnabled, int_LocalTime, Triggered, (int)m_BonusType));
-    LOG_INFO("server.worldserver", "> CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}", 
-        CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime, Triggered, (int)m_BonusType);
+#if WEEKENDBONUS_DEBUG
+    LOG_INFO("weekendbonus", "> CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
+        CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime, Triggered, (int)m_BonusType, m_NamedHoliday);
 #endif
 
     if (Triggered)
@@ -122,11 +118,11 @@ bool WeekendBonus::IsTodayHoliday()
     if (m_HolidayDates.empty()) return false;
     for (const auto& date : m_HolidayDates)
     {
-#if WEEKENDBOUS_DEBUG
-        LOG_INFO("server.worldserver", "> HM: {}, HD: {}, LM: {}, LD: {}", 
-            date.first, date.second, tm_LocalTime->tm_mon + 1, tm_LocalTime->tm_mday);
+#if WEEKENDBONUS_DEBUG
+        LOG_INFO("weekendbonus", "> HM: {}, HD: {}, LM: {}, LD: {}", 
+            date.first, date.second, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
 #endif
-        if ((tm_LocalTime->tm_mon + 1) == date.first && tm_LocalTime->tm_mday == date.second)
+        if ((tm_LocalTime.tm_mon + 1) == date.first && tm_LocalTime.tm_mday == date.second)
         {
             return true;
         }
@@ -150,9 +146,13 @@ bool WeekendBonus::HasActiveMultipliers()
 void WeekendBonus::UpdateLocalTime()
 {
     LocalTime = time(NULL);
-    tm_LocalTime = localtime(&LocalTime);
+    #if defined(_WIN32) || defined(_WIN64)
+        localtime_s(&tm_LocalTime, &LocalTime);
+    #else
+        localtime_r(&LocalTime, &tm_LocalTime);
+    #endif    
     // returns time as integer, i.e. 23:19:35 would be 231935
-    int_LocalTime = (tm_LocalTime->tm_hour * 10000) + (tm_LocalTime->tm_min * 100) + tm_LocalTime->tm_sec;
+    int_LocalTime = (tm_LocalTime.tm_hour * 10000) + (tm_LocalTime.tm_min * 100) + tm_LocalTime.tm_sec;
 }
 
 BonusTypes WeekendBonus::GetCurrentBonusType()
@@ -162,8 +162,8 @@ BonusTypes WeekendBonus::GetCurrentBonusType()
         m_BonusMultiplier = BM_HOLIDAY;
         return BONUS_HOLIDAY;
     }
-    else if ((tm_LocalTime->tm_wday == Day::FRIDAY && tm_LocalTime->tm_hour >= 18) ||
-            tm_LocalTime->tm_wday == Day::SATURDAY || tm_LocalTime->tm_wday == Day::SUNDAY)
+    else if ((tm_LocalTime.tm_wday == Day::FRIDAY && tm_LocalTime.tm_hour >= 18) ||
+            tm_LocalTime.tm_wday == Day::SATURDAY || tm_LocalTime.tm_wday == Day::SUNDAY)
     {
         m_BonusMultiplier = BM_WEEKEND;
         return BONUS_WEEKEND;
