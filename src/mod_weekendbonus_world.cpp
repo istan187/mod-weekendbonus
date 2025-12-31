@@ -56,15 +56,15 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             SetRates(false);
             if (m_BonusType == BONUS_WEEKEND)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is no longer active.");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "|cffadb5bdThe weekend bonus is no longer active.|r");
             }
             else if (m_BonusType == BONUS_EVENING)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The evening bonus is no longer active.");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "|cffadb5bdThe evening bonus is no longer active.|r");
             }
             else if (m_BonusType == BONUS_HOLIDAY)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The holiday bonus is no longer active.");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "|cffadb5bdThe holiday bonus is no longer active.|r");
             }
             m_BonusType = BONUS_NONE;
         }
@@ -76,15 +76,15 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             {
                 if (m_BonusType == BONUS_WEEKEND)
                 {
-                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is active, granting you bonuses!");
+                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00weekend bonus|r is active, granting you bonuses!");
                 }
                 else if (m_BonusType == BONUS_EVENING)
                 {
-                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The evening bonus is active, granting you bonuses!");
+                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00evening bonus|r is active, granting you bonuses!");
                 }
                 else if (m_BonusType == BONUS_HOLIDAY)
                 {
-                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The holiday bonus is active, granting you bonuses!");
+                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00holiday bonus|r is active, granting you bonuses!");
                 }
                 AnnouncementTime = 0s;
             }
@@ -99,15 +99,15 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             SetRates(true);
             if (bonus == BONUS_WEEKEND)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The weekend bonus is now active, granting you bonuses!");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00weekend bonus|r is now active, granting you bonuses!");
             }
             else if (bonus == BONUS_EVENING)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The evening bonus is now active, granting you bonuses!");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00evening bonus|r is now active, granting you bonuses!");
             }
             else if (bonus == BONUS_HOLIDAY)
             {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The holiday bonus is now active, granting you bonuses!");
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00holiday bonus|r is now active, granting you bonuses!");
             }
         }
     }    
