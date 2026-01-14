@@ -44,6 +44,8 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
     m_EveningStart = sConfigMgr->GetOption<int>("WeekendBonus.Evening.Bonuses.Start", 180000);
     m_EveningEnd = sConfigMgr->GetOption<int>("WeekendBonus.Evening.Bonuses.End", 220000);
 
+    LOG_INFO("weekendbonus", "> Evening Start / End: {} / {}", m_EveningStart, m_EveningEnd);
+
     m_ExperienceMultiplier[BM_EVENING] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Evening.Experience", 2.0f);
     m_MoneyMultiplier[BM_EVENING] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Evening.Money", 2.0f);
     m_ProfessionsMultiplier[BM_EVENING] = sConfigMgr->GetOption<uint32>("WeekendBonus.Multiplier.Evening.Professions", 2);
