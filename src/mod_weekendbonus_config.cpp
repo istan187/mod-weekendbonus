@@ -39,6 +39,11 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
 
     // evening multipliers
     m_EveningEnabled = sConfigMgr->GetOption<bool>("WeekendBonus.Evening.Bonuses.Enabled", 0);
+
+    // 18:00:00 to 22:00:00 (6 PM to 10 PM) is considered the default evening period, if not otherwise specified in the configuration
+    m_EveningStart = sConfigMgr->GetOption<int>("WeekendBonus.Evening.Start", 180000);
+    m_EveningEnd = sConfigMgr->GetOption<int>("WeekendBonus.Evening.End", 220000);
+
     m_ExperienceMultiplier[BM_EVENING] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Evening.Experience", 2.0f);
     m_MoneyMultiplier[BM_EVENING] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Evening.Money", 2.0f);
     m_ProfessionsMultiplier[BM_EVENING] = sConfigMgr->GetOption<uint32>("WeekendBonus.Multiplier.Evening.Professions", 2);

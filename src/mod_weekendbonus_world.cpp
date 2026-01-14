@@ -6,10 +6,6 @@
 #include <format>
 #endif
 
-// 18:00:00 to 22:00:00 (6 PM to 10 PM) is considered evening
-#define EVENING_START 180000
-#define EVENING_END 220000
-
 void WeekendBonus::OnStartup()
 {
     LOG_INFO("weekendbonus", "> WeekendBonus Module Started");
@@ -168,7 +164,7 @@ BonusTypes WeekendBonus::GetCurrentBonusType()
         m_BonusMultiplier = BM_WEEKEND;
         return BONUS_WEEKEND;
     }
-    else if (m_EveningEnabled && (int_LocalTime >= EVENING_START  && int_LocalTime < EVENING_END))
+    else if (m_EveningEnabled && (int_LocalTime >= m_EveningStart  && int_LocalTime < m_EveningEnd))
     {
         m_BonusMultiplier = BM_EVENING;
         return BONUS_EVENING;

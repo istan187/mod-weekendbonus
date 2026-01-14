@@ -29,6 +29,10 @@ WeekendBonus.Multiplier.Honor = 2.0
 # Enable / Disable evening bonuses
 WeekendBonus.Evening.Bonuses.Enabled = 0
 
+# Start / End times for evening bonuses
+WeekendBonus.Evening.Bonuses.Start = 180000
+WeekendBonus.Evening.Bonuses.End = 220000
+
 # Multiplier for experience gains on evenings
 WeekendBonus.Multiplier.Evening.Experience = 2.0
 

@@ -62,6 +62,8 @@ private:
     time_t LocalTime;
     struct tm tm_LocalTime;
     int int_LocalTime;
+    int m_EveningStart;
+    int m_EveningEnd;
     Milliseconds CheckFrequency;
     Milliseconds CheckTime;
     Milliseconds AnnouncementFrequency;
