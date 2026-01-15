@@ -8,7 +8,7 @@
 
 void WeekendBonus::OnStartup()
 {
-    LOG_INFO("weekendbonus", "> WeekendBonus Module Started");
+    LOG_INFO("weekendbonus", "Module Started");
     m_BonusMultiplier = BM_WEEKEND;
     if (!HasActiveMultipliers())
     {
@@ -40,7 +40,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
     BonusTypes bonus = GetCurrentBonusType();
 
 #if WEEKENDBONUS_DEBUG
-    LOG_INFO("weekendbonus", "> CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
+    LOG_DEBUG("weekendbonus", "CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
         CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime, Triggered, (int)m_BonusType, m_NamedHoliday);
 #endif
 
@@ -50,18 +50,8 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
         {
             // the bonus period has ended
             SetRates(false);
-            if (m_BonusType == BONUS_WEEKEND)
-            {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "|cffadb5bdThe weekend bonus is no longer active.|r");
-            }
-            else if (m_BonusType == BONUS_EVENING)
-            {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "|cffadb5bdThe evening bonus is no longer active.|r");
-            }
-            else if (m_BonusType == BONUS_HOLIDAY)
-            {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "|cffadb5bdThe holiday bonus is no longer active.|r");
-            }
+            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(bonus, MSG_BONUS_END, true));
+            LOG_INFO("weekendbonus", "{}", GetMessageText(bonus, MSG_BONUS_END, false));
             m_BonusType = BONUS_NONE;
         }
         else
@@ -70,18 +60,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             AnnouncementTime += Milliseconds(diff);
             if (AnnouncementTime > AnnouncementFrequency)
             {
-                if (m_BonusType == BONUS_WEEKEND)
-                {
-                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00weekend bonus|r is active, granting you bonuses!");
-                }
-                else if (m_BonusType == BONUS_EVENING)
-                {
-                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00evening bonus|r is active, granting you bonuses!");
-                }
-                else if (m_BonusType == BONUS_HOLIDAY)
-                {
-                    sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00holiday bonus|r is active, granting you bonuses!");
-                }
+                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(bonus, MSG_BONUS_ACTIVE, true));
                 AnnouncementTime = 0s;
             }
         }
@@ -93,18 +72,8 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             // a bonus period has started
             m_BonusType = bonus;
             SetRates(true);
-            if (bonus == BONUS_WEEKEND)
-            {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00weekend bonus|r is now active, granting you bonuses!");
-            }
-            else if (bonus == BONUS_EVENING)
-            {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00evening bonus|r is now active, granting you bonuses!");
-            }
-            else if (bonus == BONUS_HOLIDAY)
-            {
-                sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, "The |cff4CFF00holiday bonus|r is now active, granting you bonuses!");
-            }
+            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(bonus, MSG_BONUS_START, true));
+            LOG_INFO("weekendbonus", "{}", GetMessageText(bonus, MSG_BONUS_START, false));
         }
     }    
 }
@@ -115,7 +84,7 @@ bool WeekendBonus::IsTodayHoliday()
     for (const auto& date : m_HolidayDates)
     {
 #if WEEKENDBONUS_DEBUG
-        LOG_INFO("weekendbonus", "> HM: {}, HD: {}, LM: {}, LD: {}", 
+        LOG_DEBUG("weekendbonus", "HM: {}, HD: {}, LM: {}, LD: {}", 
             date.first, date.second, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
 #endif
         if ((tm_LocalTime.tm_mon + 1) == date.first && tm_LocalTime.tm_mday == date.second)
@@ -173,4 +142,44 @@ BonusTypes WeekendBonus::GetCurrentBonusType()
     // no bonus active, use weekend as default multiplier
     m_BonusMultiplier = BM_WEEKEND;
     return BONUS_NONE;
+}
+
+std::string WeekendBonus::GetMessageText(BonusTypes bonusType, MessageTypes messageType, bool needColorCodes, std::string colorCode)
+{
+    std::string message = "";
+    std::string colorStart = (needColorCodes) ? "|c" + colorCode : "";
+    std::string colorEnd = (needColorCodes) ? "|r" : "";
+    std::string bonusName;
+
+    switch (bonusType)
+    {
+    case BONUS_WEEKEND:
+        bonusName = "weekend";
+        break;
+    case BONUS_EVENING:
+        bonusName = "evening";
+        break;
+    case BONUS_HOLIDAY:
+        bonusName = "holiday";
+        break;
+    case BONUS_NONE:
+        bonusName = "";
+        break;
+    };
+
+    switch (messageType)
+    {
+    case MSG_BONUS_START:
+        message = std::format("The {}{} bonus{} is now active, granting you bonuses!", colorStart, bonusName, colorEnd);
+        break;
+    case MSG_BONUS_ACTIVE:
+        message = std::format("The {}{} bonus{} is active, granting you bonuses!", colorStart, bonusName, colorEnd);
+        break;
+    case MSG_BONUS_END:
+        message = std::format("The {}{} bonus{} is no longer active.", colorStart, bonusName, colorEnd);
+        break;
+    case MSG_LAST:
+        break;
+    }
+    return message;
 }

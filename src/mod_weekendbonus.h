@@ -33,6 +33,14 @@ enum BonusMultipliers
     BM_LAST
 };
 
+enum MessageTypes
+{
+    MSG_BONUS_START = 0,
+    MSG_BONUS_ACTIVE,
+    MSG_BONUS_END,
+    MSG_LAST
+};
+
 class WeekendBonus : public PlayerScript, WorldScript
 {
 public:
@@ -55,6 +63,7 @@ private:
     void DoBonusUpdateCheck(uint32 diff);
     bool IsTodayHoliday();
     std::string CheckForNamedHoliday(const std::string& holidayName);
+    std::string GetMessageText(BonusTypes bonusType, MessageTypes messageType, bool needColorCodes, std::string colorCode = "ff4CFF00");
 
     bool Triggered;
     BonusTypes m_BonusType;

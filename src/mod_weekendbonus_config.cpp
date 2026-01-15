@@ -8,7 +8,7 @@
 
 void WeekendBonus::OnAfterConfigLoad(bool reload)
 {
-    LOG_INFO("weekendbonus", "> WeekendBonus Loading Configuration");
+    LOG_INFO("weekendbonus", "Loading Configuration");
 
     UpdateLocalTime();
 
@@ -44,7 +44,7 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
     m_EveningStart = sConfigMgr->GetOption<int>("WeekendBonus.Evening.Bonuses.Start", 180000);
     m_EveningEnd = sConfigMgr->GetOption<int>("WeekendBonus.Evening.Bonuses.End", 220000);
 
-    LOG_INFO("weekendbonus", "> Evening Start / End: {} / {}", m_EveningStart, m_EveningEnd);
+    LOG_INFO("weekendbonus", "Evening Start / End: {} / {}", m_EveningStart, m_EveningEnd);
 
     m_ExperienceMultiplier[BM_EVENING] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Evening.Experience", 2.0f);
     m_MoneyMultiplier[BM_EVENING] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Evening.Money", 2.0f);
@@ -64,7 +64,7 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
     m_HonorMultiplier[BM_HOLIDAY] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Holiday.Honor", 2.0f);
 
 #if WEEKENDBONUS_DEBUG
-    LOG_INFO("weekendbonus", "> Holiday List: {}", holidayListStr);
+    LOG_DEBUG("weekendbonus", "Holiday List: {}", holidayListStr);
 #endif
 
     m_HolidayDates.clear();
@@ -74,7 +74,7 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
         for (const std::string& dateStr : stringSplit(holidayListStr, ','))
         {
 #if WEEKENDBONUS_DEBUG
-    LOG_INFO("weekendbonus", "> Date: {}", dateStr);
+    LOG_DEBUG("weekendbonus", "Date: {}", dateStr);
 #endif
             int month = 0;
             int day = 0;
@@ -83,14 +83,14 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
                 std::string namedDate = CheckForNamedHoliday(dateStr);
                 if (namedDate.empty()) {
 #if WEEKENDBONUS_DEBUG
-    LOG_INFO("weekendbonus", "> Date: {}", " - unrecognized named holiday");
+    LOG_DEBUG("weekendbonus", "Date: {}", " - unrecognized named holiday");
 #endif
                     continue; // unrecognized named holiday
                 }
                 else
                 {
 #if WEEKENDBONUS_DEBUG
-    LOG_INFO("weekendbonus", "> Named MM/DD: {}", namedDate);
+    LOG_DEBUG("weekendbonus", "Named MM/DD: {}", namedDate);
 #endif
                     month = std::stoi(namedDate.substr(0, 2));
                     day = std::stoi(namedDate.substr(3, 2));
@@ -99,7 +99,7 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
             else
             {
 #if WEEKENDBONUS_DEBUG
-    LOG_INFO("weekendbonus", "> MM/DD: {}", dateStr);
+    LOG_DEBUG("weekendbonus", "MM/DD: {}", dateStr);
 #endif
                 month = std::stoi(dateStr.substr(0, sep));
                 day = std::stoi(dateStr.substr(sep + 1));
