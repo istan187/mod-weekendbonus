@@ -50,8 +50,8 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
         {
             // the bonus period has ended
             SetRates(false);
-            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(bonus, MSG_BONUS_END, true));
-            LOG_INFO("weekendbonus", "{}", GetMessageText(bonus, MSG_BONUS_END, false));
+            sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(m_BonusType, MSG_BONUS_END, true));
+            LOG_INFO("weekendbonus", "{}", GetMessageText(m_BonusType, MSG_BONUS_END, false));
             m_BonusType = BONUS_NONE;
         }
         else
