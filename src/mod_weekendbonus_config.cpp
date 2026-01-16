@@ -63,9 +63,7 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
     m_ProficienciesMultiplier[BM_HOLIDAY] = sConfigMgr->GetOption<uint32>("WeekendBonus.Multiplier.Holiday.Proficiencies", 2);
     m_HonorMultiplier[BM_HOLIDAY] = sConfigMgr->GetOption<float>("WeekendBonus.Multiplier.Holiday.Honor", 2.0f);
 
-#if WEEKENDBONUS_DEBUG
     LOG_DEBUG("weekendbonus", "Holiday List: {}", holidayListStr);
-#endif
 
     m_HolidayDates.clear();
     if (!holidayListStr.empty())
@@ -73,34 +71,26 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
         // dates will be delimited by commas, each date in MM/DD format
         for (const std::string& dateStr : stringSplit(holidayListStr, ','))
         {
-#if WEEKENDBONUS_DEBUG
-    LOG_DEBUG("weekendbonus", "Date: {}", dateStr);
-#endif
+            LOG_DEBUG("weekendbonus", "Date: {}", dateStr);
             int month = 0;
             int day = 0;
             size_t sep = dateStr.find('/');
             if (sep == std::string::npos) {
                 std::string namedDate = CheckForNamedHoliday(dateStr);
                 if (namedDate.empty()) {
-#if WEEKENDBONUS_DEBUG
-    LOG_DEBUG("weekendbonus", "Date: {}", " - unrecognized named holiday");
-#endif
+                    LOG_DEBUG("weekendbonus", "Date: {}", " - unrecognized named holiday");
                     continue; // unrecognized named holiday
                 }
                 else
                 {
-#if WEEKENDBONUS_DEBUG
-    LOG_DEBUG("weekendbonus", "Named MM/DD: {}", namedDate);
-#endif
+                    LOG_DEBUG("weekendbonus", "Named MM/DD: {}", namedDate);
                     month = std::stoi(namedDate.substr(0, 2));
                     day = std::stoi(namedDate.substr(3, 2));
                 }
             }
             else
             {
-#if WEEKENDBONUS_DEBUG
-    LOG_DEBUG("weekendbonus", "MM/DD: {}", dateStr);
-#endif
+                LOG_DEBUG("weekendbonus", "MM/DD: {}", dateStr);
                 month = std::stoi(dateStr.substr(0, sep));
                 day = std::stoi(dateStr.substr(sep + 1));
             }

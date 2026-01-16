@@ -4,8 +4,6 @@
 #include "ScriptMgr.h"
 #include <time.h>
 
-#define WEEKENDBONUS_DEBUG 0
-
 enum Day
 {
     SUNDAY = 0,

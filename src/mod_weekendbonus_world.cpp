@@ -2,9 +2,7 @@
 
 #include "WorldSessionMgr.h"
 
-#if WEEKENDBONUS_DEBUG
 #include <format>
-#endif
 
 void WeekendBonus::OnStartup()
 {
@@ -39,10 +37,8 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
     UpdateLocalTime();
     BonusTypes bonus = GetCurrentBonusType();
 
-#if WEEKENDBONUS_DEBUG
     LOG_DEBUG("weekendbonus", "CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
         CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime, Triggered, (int)m_BonusType, m_NamedHoliday);
-#endif
 
     if (Triggered)
     {
@@ -83,10 +79,8 @@ bool WeekendBonus::IsTodayHoliday()
     if (m_HolidayDates.empty()) return false;
     for (const auto& date : m_HolidayDates)
     {
-#if WEEKENDBONUS_DEBUG
         LOG_DEBUG("weekendbonus", "HM: {}, HD: {}, LM: {}, LD: {}", 
             date.first, date.second, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
-#endif
         if ((tm_LocalTime.tm_mon + 1) == date.first && tm_LocalTime.tm_mday == date.second)
         {
             return true;
