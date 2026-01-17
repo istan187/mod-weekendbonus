@@ -34,6 +34,44 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
     {
         return "12/31";
     }
+    else if (equalsIgnoreCase(holidayName, "US_MLK_Day"))
+    {
+        // Martin Luther King Jr. Day is the third Monday in January
+        int january = 1;
+        int firstDayOfMonth = 1;
+
+        struct tm firstOfJanuary = {};
+        firstOfJanuary.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfJanuary.tm_mon = january - 1;            // zero-based month
+        firstOfJanuary.tm_mday = firstDayOfMonth;
+
+        mktime(&firstOfJanuary); // normalize to get the correct weekday
+
+        int firstMondayOffset = (1 - firstOfJanuary.tm_wday + 7) % 7; // 1 = Monday
+        int mlkDay = firstDayOfMonth + firstMondayOffset + 14; // third Monday
+
+        return (january < 10 ? "0" : "") + std::to_string(january) + "/" +
+               (mlkDay < 10 ? "0" : "") + std::to_string(mlkDay);
+    }
+    else if (equalsIgnoreCase(holidayName, "US_Presidents_Day"))
+    {
+        // Presidents' Day is the third Monday in February
+        int february = 2;
+        int firstDayOfMonth = 1;
+
+        struct tm firstOfFebruary = {};
+        firstOfFebruary.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfFebruary.tm_mon = february - 1;          // zero-based month
+        firstOfFebruary.tm_mday = firstDayOfMonth;
+
+        mktime(&firstOfFebruary); // normalize to get the correct weekday
+
+        int firstMondayOffset = (1 - firstOfFebruary.tm_wday + 7) % 7; // 1 = Monday
+        int presidentsDay = firstDayOfMonth + firstMondayOffset + 14; // third Monday
+
+        return (february < 10 ? "0" : "") + std::to_string(february) + "/" +
+               (presidentsDay < 10 ? "0" : "") + std::to_string(presidentsDay);
+    }
     else if (equalsIgnoreCase(holidayName, "US_Valentines_Day"))
     {
         return "02/14";

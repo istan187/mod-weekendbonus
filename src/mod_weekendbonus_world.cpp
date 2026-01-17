@@ -6,7 +6,7 @@
 
 void WeekendBonus::OnStartup()
 {
-    LOG_INFO("weekendbonus", "Module Started");
+    LOG_INFO("weekendbonus", "{} : Module Started", GetFormattedTimestamp());
     m_BonusMultiplier = BM_WEEKEND;
     if (!HasActiveMultipliers())
     {
@@ -37,8 +37,9 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
     UpdateLocalTime();
     BonusTypes bonus = GetCurrentBonusType();
 
-    LOG_DEBUG("weekendbonus", "CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
-        CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime, Triggered, (int)m_BonusType, m_NamedHoliday);
+    LOG_DEBUG("weekendbonus", "{} : CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
+        GetFormattedTimestamp(), CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime,
+        Triggered, (int)m_BonusType, m_NamedHoliday);
 
     if (Triggered)
     {
@@ -47,7 +48,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             // the bonus period has ended
             SetRates(false);
             sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(m_BonusType, MSG_BONUS_END, true));
-            LOG_INFO("weekendbonus", "{}", GetMessageText(m_BonusType, MSG_BONUS_END, false));
+            LOG_INFO("weekendbonus", "{} : {}{}", GetFormattedTimestamp(), GetMessageText(m_BonusType, MSG_BONUS_END, false), (bonus==BONUS_HOLIDAY ? " (" + m_NamedHoliday + ")" : ""));
             m_BonusType = BONUS_NONE;
         }
         else
@@ -69,7 +70,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             m_BonusType = bonus;
             SetRates(true);
             sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(bonus, MSG_BONUS_START, true));
-            LOG_INFO("weekendbonus", "{}", GetMessageText(bonus, MSG_BONUS_START, false));
+            LOG_INFO("weekendbonus", "{} : {}{}", GetFormattedTimestamp(), GetMessageText(bonus, MSG_BONUS_START, false), (bonus==BONUS_HOLIDAY ? " (" + m_NamedHoliday + ")" : ""));
         }
     }    
 }
@@ -79,8 +80,8 @@ bool WeekendBonus::IsTodayHoliday()
     if (m_HolidayDates.empty()) return false;
     for (const auto& date : m_HolidayDates)
     {
-        LOG_DEBUG("weekendbonus", "HM: {}, HD: {}, LM: {}, LD: {}", 
-            date.first, date.second, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
+        LOG_DEBUG("weekendbonus", "{} : HM: {}, HD: {}, LM: {}, LD: {}", 
+            GetFormattedTimestamp(), date.first, date.second, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
         if ((tm_LocalTime.tm_mon + 1) == date.first && tm_LocalTime.tm_mday == date.second)
         {
             return true;
@@ -176,4 +177,11 @@ std::string WeekendBonus::GetMessageText(BonusTypes bonusType, MessageTypes mess
         break;
     }
     return message;
+}
+
+std::string WeekendBonus::GetFormattedTimestamp()
+{
+    char buffer[100];
+    strftime(buffer, sizeof(buffer), "%Y-%m-%d %H:%M:%S", &tm_LocalTime);
+    return std::string(buffer);
 }
