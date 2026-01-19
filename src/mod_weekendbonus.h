@@ -62,7 +62,6 @@ private:
     bool IsTodayHoliday();
     std::string CheckForNamedHoliday(const std::string& holidayName);
     std::string GetMessageText(BonusTypes bonusType, MessageTypes messageType, bool needColorCodes, std::string colorCode = "ff4CFF00");
-    std::string GetFormattedTimestamp();
 
     bool Triggered;
     BonusTypes m_BonusType;
