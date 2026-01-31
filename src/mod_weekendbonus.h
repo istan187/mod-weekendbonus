@@ -1,5 +1,4 @@
-#ifndef MOD_WEEKENDBONUS_H
-#define MOD_WEEKENDBONUS_H
+#pragma once
 
 #include "ScriptMgr.h"
 #include <time.h>
@@ -39,19 +38,43 @@ enum MessageTypes
     MSG_LAST
 };
 
+class WeekendBonus;
+
+class WeekendBonusNamedDate
+{
+public:
+    WeekendBonusNamedDate(int month, int day, const std::string& name) : month(month), day(day), name(name) {}
+    static WeekendBonusNamedDate FromString(WeekendBonus& weekendBonus, const std::string& holidayName);
+    int month;
+    int day;
+    std::string name;
+    
+    std::string ToString() const
+    {
+        return (month < 10 ? "0" : "") + std::to_string(month) + "/" +
+        (day < 10 ? "0" : "") + std::to_string(day);
+    }
+    std::string ToNameString() const
+    {
+        return (name.length() > 0 ? name : "N/A");
+    }
+};
+
 class WeekendBonus : public PlayerScript, WorldScript
 {
+    friend class WeekendBonusNamedDate;
+
 public:
     WeekendBonus();
 
     // PlayerScript
     void OnPlayerLogin(Player* /*player*/) override;
-
+    
     // WorldScript
     void OnAfterConfigLoad(bool /*reload*/) override;
     void OnStartup() override;
     void OnUpdate(uint32 /*diff*/) override;
-
+    
 private:
     void LoadDefaultValues();
     void SetRates(bool /*active*/);
@@ -75,7 +98,7 @@ private:
     Milliseconds CheckTime;
     Milliseconds AnnouncementFrequency;
     Milliseconds AnnouncementTime;
-    std::string m_NamedHoliday;
+    WeekendBonusNamedDate m_CurrentHoliday;
 
     // weekend multipliers
     float m_ExperienceMultiplier[BonusMultipliers::BM_LAST];
@@ -89,7 +112,7 @@ private:
     bool m_EveningEnabled;
     bool m_HolidayEnabled;
 
-    std::vector<std::pair<int, int>> m_HolidayDates; // month, day
+    std::vector<WeekendBonusNamedDate> m_HolidayDates;
 
     // default multipliers
     float m_DefaultExperienceMultiplier[6];
@@ -100,5 +123,3 @@ private:
     float m_DefaultReputationMultiplier;
     float m_DefaultHonorMultiplier;
 };
-
-#endif

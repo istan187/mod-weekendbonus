@@ -1,5 +1,4 @@
 #include "mod_weekendbonus.h"
-
 #include "WorldSessionMgr.h"
 
 #include <format>
@@ -39,7 +38,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
 
     LOG_DEBUG("WeekendBonus", "CHK: {}, EE: {}, HE: {}, TIME: {}, TRIGGERED: {}, BONUS: {}, HOLIDAY: {}", 
         CheckTime, m_EveningEnabled, m_HolidayEnabled, int_LocalTime,
-        Triggered, (int)m_BonusType, m_NamedHoliday);
+        Triggered, (int)m_BonusType, m_CurrentHoliday.ToNameString());
 
     if (Triggered)
     {
@@ -48,8 +47,9 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             // the bonus period has ended
             SetRates(false);
             sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(m_BonusType, MSG_BONUS_END, true));
-            LOG_INFO("WeekendBonus", "{}{}", GetMessageText(m_BonusType, MSG_BONUS_END, false), (bonus==BONUS_HOLIDAY ? " (" + m_NamedHoliday + ")" : ""));
+            LOG_INFO("WeekendBonus", "{}{}", GetMessageText(m_BonusType, MSG_BONUS_END, false), (bonus==BONUS_HOLIDAY ? " (" + m_CurrentHoliday.ToNameString() + ")" : ""));
             m_BonusType = BONUS_NONE;
+            m_CurrentHoliday = WeekendBonusNamedDate(0, 0, "");
         }
         else
         {
@@ -70,7 +70,7 @@ void WeekendBonus::DoBonusUpdateCheck(uint32 diff)
             m_BonusType = bonus;
             SetRates(true);
             sWorldSessionMgr->SendServerMessage(SERVER_MSG_STRING, GetMessageText(bonus, MSG_BONUS_START, true));
-            LOG_INFO("WeekendBonus", "{}{}", GetMessageText(bonus, MSG_BONUS_START, false), (bonus==BONUS_HOLIDAY ? " (" + m_NamedHoliday + ")" : ""));
+            LOG_INFO("WeekendBonus", "{}{}", GetMessageText(bonus, MSG_BONUS_START, false), (bonus==BONUS_HOLIDAY ? " (" + m_CurrentHoliday.ToNameString() + ")" : ""));
         }
     }    
 }
@@ -81,9 +81,10 @@ bool WeekendBonus::IsTodayHoliday()
     for (const auto& date : m_HolidayDates)
     {
         LOG_DEBUG("WeekendBonus", "HM: {}, HD: {}, LM: {}, LD: {}", 
-            date.first, date.second, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
-        if ((tm_LocalTime.tm_mon + 1) == date.first && tm_LocalTime.tm_mday == date.second)
+            date.month, date.day, tm_LocalTime.tm_mon + 1, tm_LocalTime.tm_mday);
+        if ((tm_LocalTime.tm_mon + 1) == date.month && tm_LocalTime.tm_mday == date.day)
         {
+            m_CurrentHoliday = date;
             return true;
         }
     }

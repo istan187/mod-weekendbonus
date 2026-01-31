@@ -13,7 +13,7 @@
     Yes, it is a messy way to do it, but it gets the job done without
     requiring complex data structures or external libraries.
 */
-std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
+WeekendBonusNamedDate WeekendBonusNamedDate::FromString(WeekendBonus& weekendBonus, const std::string &holidayName)
 {
     // Case-insensitive string comparison
     auto equalsIgnoreCase = [](const std::string& a, const std::string& b) {
@@ -21,18 +21,18 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
                           [](char c1, char c2) { return std::tolower(c1) == std::tolower(c2); });
     };
 
-    m_NamedHoliday = holidayName;
+    //m_NamedHoliday = holidayName;
     if (equalsIgnoreCase(holidayName, "US_New_Years_Day"))
     {
-        return "01/01";
+        return WeekendBonusNamedDate(1, 1, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Christmas_Eve"))
     {
-        return "12/24";
+        return WeekendBonusNamedDate(12, 24, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_New_Years_Eve"))
     {
-        return "12/31";
+        return WeekendBonusNamedDate(12, 31, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_MLK_Day"))
     {
@@ -41,7 +41,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstDayOfMonth = 1;
 
         struct tm firstOfJanuary = {};
-        firstOfJanuary.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfJanuary.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         firstOfJanuary.tm_mon = january - 1;            // zero-based month
         firstOfJanuary.tm_mday = firstDayOfMonth;
 
@@ -50,8 +50,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstMondayOffset = (1 - firstOfJanuary.tm_wday + 7) % 7; // 1 = Monday
         int mlkDay = firstDayOfMonth + firstMondayOffset + 14; // third Monday
 
-        return (january < 10 ? "0" : "") + std::to_string(january) + "/" +
-               (mlkDay < 10 ? "0" : "") + std::to_string(mlkDay);
+        return WeekendBonusNamedDate(january, mlkDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Presidents_Day"))
     {
@@ -60,7 +59,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstDayOfMonth = 1;
 
         struct tm firstOfFebruary = {};
-        firstOfFebruary.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfFebruary.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         firstOfFebruary.tm_mon = february - 1;          // zero-based month
         firstOfFebruary.tm_mday = firstDayOfMonth;
 
@@ -69,24 +68,23 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstMondayOffset = (1 - firstOfFebruary.tm_wday + 7) % 7; // 1 = Monday
         int presidentsDay = firstDayOfMonth + firstMondayOffset + 14; // third Monday
 
-        return (february < 10 ? "0" : "") + std::to_string(february) + "/" +
-               (presidentsDay < 10 ? "0" : "") + std::to_string(presidentsDay);
+        return WeekendBonusNamedDate(february, presidentsDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Valentines_Day"))
     {
-        return "02/14";
+        return WeekendBonusNamedDate(2, 14, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Halloween"))
     {
-        return "10/31";
+        return WeekendBonusNamedDate(10, 31, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Saint_Patricks_Day"))
     {
-        return "03/17";
+        return WeekendBonusNamedDate(3, 17, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_April_Fools_Day"))
     {
-        return "04/01";
+        return WeekendBonusNamedDate(4, 1, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Mothers_Day"))
     {
@@ -95,7 +93,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstDayOfMonth = 1;
 
         struct tm firstOfMay = {};
-        firstOfMay.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfMay.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         firstOfMay.tm_mon = may - 1;               // zero-based month
         firstOfMay.tm_mday = firstDayOfMonth;
 
@@ -104,8 +102,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstSundayOffset = (0 - firstOfMay.tm_wday + 7) % 7; // 0 = Sunday
         int mothersDay = firstDayOfMonth + firstSundayOffset + 7; // second Sunday
 
-        return (may < 10 ? "0" : "") + std::to_string(may) + "/" +
-               (mothersDay < 10 ? "0" : "") + std::to_string(mothersDay);
+        return WeekendBonusNamedDate(may, mothersDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Fathers_Day"))
     {
@@ -114,7 +111,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstDayOfMonth = 1;
 
         struct tm firstOfJune = {};
-        firstOfJune.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfJune.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         firstOfJune.tm_mon = june - 1;              // zero-based month
         firstOfJune.tm_mday = firstDayOfMonth;
 
@@ -123,8 +120,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstSundayOffset = (0 - firstOfJune.tm_wday + 7) % 7; // 0 = Sunday
         int fathersDay = firstDayOfMonth + firstSundayOffset + 14; // third Sunday
 
-        return (june < 10 ? "0" : "") + std::to_string(june) + "/" +
-               (fathersDay < 10 ? "0" : "") + std::to_string(fathersDay);
+        return WeekendBonusNamedDate(june, fathersDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Labor_Day"))
     {
@@ -133,7 +129,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstDayOfMonth = 1;
 
         struct tm firstOfSept = {};
-        firstOfSept.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfSept.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         firstOfSept.tm_mon = september - 1;         // zero-based month
         firstOfSept.tm_mday = firstDayOfMonth;
 
@@ -142,8 +138,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstMondayOffset = (1 - firstOfSept.tm_wday + 7) % 7; // 1 = Monday
         int laborDay = firstDayOfMonth + firstMondayOffset; // first Monday
 
-        return (september < 10 ? "0" : "") + std::to_string(september) + "/" +
-               (laborDay < 10 ? "0" : "") + std::to_string(laborDay);
+        return WeekendBonusNamedDate(september, laborDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Memorial_Day"))
     {
@@ -152,7 +147,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int lastDayOfMonth = 31;
 
         struct tm lastOfMay = {};
-        lastOfMay.tm_year = tm_LocalTime.tm_year; // current year
+        lastOfMay.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         lastOfMay.tm_mon = may - 1;               // zero-based month
         lastOfMay.tm_mday = lastDayOfMonth;
 
@@ -161,12 +156,11 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int lastMondayOffset = (lastOfMay.tm_wday - 1 + 7) % 7; // 1 = Monday
         int memorialDay = lastDayOfMonth - lastMondayOffset; // last Monday
 
-        return (may < 10 ? "0" : "") + std::to_string(may) + "/" +
-               (memorialDay < 10 ? "0" : "") + std::to_string(memorialDay);
+        return WeekendBonusNamedDate(may, memorialDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Independence_Day"))
     {
-        return "07/04";
+        return WeekendBonusNamedDate(7, 4, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "US_Thanksgiving"))
     {
@@ -175,7 +169,7 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstDayOfMonth = 1;
         
         struct tm firstOfNov = {};
-        firstOfNov.tm_year = tm_LocalTime.tm_year; // current year
+        firstOfNov.tm_year = weekendBonus.tm_LocalTime.tm_year; // current year
         firstOfNov.tm_mon = november - 1;          // zero-based month
         firstOfNov.tm_mday = firstDayOfMonth;
         
@@ -184,17 +178,16 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int firstThursdayOffset = (4 - firstOfNov.tm_wday + 7) % 7; // 4 = Thursday
         int thanksgivingDay = firstDayOfMonth + firstThursdayOffset + 21; // fourth Thursday
         
-        return (november < 10 ? "0" : "") + std::to_string(november) + "/" +
-            (thanksgivingDay < 10 ? "0" : "") + std::to_string(thanksgivingDay);
+        return WeekendBonusNamedDate(november, thanksgivingDay, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "Christmas"))
     {
-        return "12/25";
+        return WeekendBonusNamedDate(12, 25, holidayName);
     }
     else if (equalsIgnoreCase(holidayName, "Easter"))
     {
         // Calculate Easter date using Anonymous Gregorian algorithm
-        int year = tm_LocalTime.tm_year + 1900; // tm_year is years since 1900
+        int year = weekendBonus.tm_LocalTime.tm_year + 1900; // tm_year is years since 1900
         int a = year % 19;
         int b = year / 100;
         int c = year % 100;
@@ -210,18 +203,16 @@ std::string WeekendBonus::CheckForNamedHoliday(const std::string& holidayName)
         int month = (h + l - 7 * m + 114) / 31; // March=3, April=4
         int day = ((h + l - 7 * m + 114) % 31) + 1;
     
-        return (month < 10 ? "0" : "") + std::to_string(month) + "/" +
-               (day < 10 ? "0" : "") + std::to_string(day);
-    }
-    /*else if (equalsIgnoreCase(holidayName, "TEST_TODAY"))
+        return WeekendBonusNamedDate(month, day, holidayName);
+    }/*
+    else if (equalsIgnoreCase(holidayName, "TEST_TODAY"))
     {
         // For testing purposes, return today's date
-        int month = tm_LocalTime.tm_mon + 1;
-        int day = tm_LocalTime.tm_mday;
-        return (month < 10 ? "0" : "") + std::to_string(month) + "/" +
-               (day < 10 ? "0" : "") + std::to_string(day);
+        int month = weekendBonus.tm_LocalTime.tm_mon + 1;
+        int day = weekendBonus.tm_LocalTime.tm_mday;
+        return WeekendBonusNamedDate(month, day, holidayName);
     }*/
-    
-    m_NamedHoliday = "";
-    return "";
+
+    // Holiday name not recognized, return a default invalid date
+    return WeekendBonusNamedDate(0, 0, "");
 }

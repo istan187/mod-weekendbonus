@@ -1,6 +1,5 @@
-#include "Chat.h"
-
 #include "mod_weekendbonus.h"
+#include "Chat.h"
 
 void WeekendBonus::OnPlayerLogin(Player* player)
 {

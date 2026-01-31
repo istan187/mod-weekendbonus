@@ -1,5 +1,4 @@
 #include "mod_weekendbonus.h"
-
 #include "Config.h"
 
 #include <sstream>
@@ -77,16 +76,15 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
             int day = 0;
             size_t sep = dateStr.find('/');
             if (sep == std::string::npos) {
-                std::string namedDate = CheckForNamedHoliday(dateStr);
-                if (namedDate.empty()) {
+                WeekendBonusNamedDate namedDate = WeekendBonusNamedDate::FromString(*this, dateStr);
+                if (namedDate.month == 0 && namedDate.day == 0) {
                     LOG_DEBUG("WeekendBonus", "Date: {} - unrecognized named holiday", dateStr);
                     continue; // unrecognized named holiday
                 }
                 else
                 {
-                    LOG_DEBUG("WeekendBonus", "Named MM/DD: {}", namedDate);
-                    month = std::stoi(namedDate.substr(0, 2));
-                    day = std::stoi(namedDate.substr(3, 2));
+                    LOG_DEBUG("WeekendBonus", "Named MM/DD: {}", namedDate.ToString());
+                    m_HolidayDates.emplace_back(namedDate);
                 }
             }
             else
@@ -94,15 +92,28 @@ void WeekendBonus::OnAfterConfigLoad(bool reload)
                 LOG_DEBUG("WeekendBonus", "MM/DD: {}", dateStr);
                 month = std::stoi(dateStr.substr(0, sep));
                 day = std::stoi(dateStr.substr(sep + 1));
-            }
 
-            // validate month/day are in valid ranges
-            if (month >= 1 && month <= 12 && day >= 1 && day <= 31)
-            {
-                m_HolidayDates.emplace_back(month, day);
+                // validate month/day are in valid ranges
+                if (month >= 1 && month <= 12 && day >= 1 && day <= 31)
+                {
+                    m_HolidayDates.emplace_back(WeekendBonusNamedDate(month, day, std::format("{:02d}/{:02d}", month, day)));
+                }
             }
         }
     }
+
+    auto holidayList = [](const std::vector<WeekendBonusNamedDate>& dates, char delimiter) {
+        std::string strlist;
+        for (const auto& d : dates)
+        {
+            if (!strlist.empty())
+                strlist += delimiter;
+            strlist += d.ToString();
+        }
+        return strlist;
+    };
+    
+    LOG_DEBUG("WeekendBonus", "Holiday Loaded: {}", holidayList(m_HolidayDates, ','));
 
     if (reload)
     {
