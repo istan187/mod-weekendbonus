@@ -188,22 +188,23 @@ WeekendBonusNamedDate WeekendBonusNamedDate::FromString(WeekendBonus& weekendBon
     {
         // Calculate Easter date using Anonymous Gregorian algorithm
         int year = weekendBonus.tm_LocalTime.tm_year + 1900; // tm_year is years since 1900
+
         int a = year % 19;
         int b = year / 100;
         int c = year % 100;
         int d = b / 4;
         int e = b % 4;
         int f = (b + 8) / 25;
-        int g = (b - f + 1) / 16;
+        int g = (b - f + 1) / 3;
         int h = (19 * a + b - d - g + 15) % 30;
-        int i = c / 16;
-        int k = c % 16;
+        int i = c / 4;
+        int k = c % 4;
         int l = (32 + 2 * e + 2 * i - h - k) % 7;
         int m = (a + 11 * h + 22 * l) / 451;
-        int month = (h + l - 7 * m + 114) / 31; // March=3, April=4
-        int day = ((h + l - 7 * m + 114) % 31) + 1;
-    
-        return WeekendBonusNamedDate(month, day, holidayName);
+        int easterMonth = (h + l - 7 * m + 114) / 31;
+        int easterDay = ((h + l - 7 * m + 114) % 31) + 1;        
+
+        return WeekendBonusNamedDate(easterMonth, easterDay, holidayName);
     }/*
     else if (equalsIgnoreCase(holidayName, "TEST_TODAY"))
     {
